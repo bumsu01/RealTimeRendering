@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kakao.bumsu01.dao.AutoUpdateMapper">
+
+    <select id="updateNowPriceRandom">
+        UPDATE
+            stock
+        SET
+            view_count = view_count + #{stock.viewCount},
+            now_price = #{stock.nowPrice},
+            trade_count = trade_count + #{stock.tradeCount}
+        WHERE
+            id = #{stock.id}
+    </select>
+
+</mapper>
