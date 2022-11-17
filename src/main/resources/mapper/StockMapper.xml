@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kakao.bumsu01.dao.StockMapper">
+
+    <resultMap id ="stockMap" type="com.kakao.bumsu01.model.dto.Stock" >
+        <id property ="id" column="id"/>
+        <result property ="code"  column ="code"/>
+        <result property ="name"  column ="name"/>
+        <result property ="startPrice"  column ="start_price"/>
+        <result property ="nowPrice"  column ="now_price"/>
+        <result property ="endPrice"  column ="end_price"/>
+        <result property ="viewCount"  column ="view_count"/>
+        <result property ="tradeCount"  column ="trade_count"/>
+        <result property ="deleteFlag"  column ="delete_flag"/>
+        <result property ="createTime"  column ="create_time"/>
+        <result property ="updateTime"  column ="update_time"/>
+        <result property ="createId"  column ="create_id"/>
+        <result property ="updateId"  column ="update_id"/>
+    </resultMap>
+
+    <select id="getAllStock" resultMap="stockMap">
+        SELECT
+        *
+        FROM
+        stock
+        WHERE
+        delete_flag = #{paramMap.deleteFlag}
+        <if test="paramMap.condition != null">
+            order by
+            <if test='paramMap.condition.equals("view")'>
+                view_count DESC
+            </if>
+            <if test='paramMap.condition.equals("rise")'>
+                (now_price - start_price) DESC
+            </if>
+            <if test='paramMap.condition.equals("drop")'>
+                (now_price - start_price) ASC
+            </if>
+            <if test='paramMap.condition.equals("trade")'>
+                trade_count DESC
+            </if>
+        </if>
+    </select>
+
+
+    <select id="getMostFiveStock" resultMap="stockMap">
+        SELECT
+        *
+        FROM
+        stock
+        WHERE
+        delete_flag = #{paramMap.deleteFlag} order by
+        <if test='paramMap.condition.equals("view")'>
+            view_count DESC
+        </if>
+        <if test='paramMap.condition.equals("rise")'>
+            (now_price - start_price) DESC
+        </if>
+        <if test='paramMap.condition.equals("drop")'>
+            (now_price - start_price) ASC
+        </if>
+        <if test='paramMap.condition.equals("trade")'>
+            trade_count DESC
+        </if>
+        limit 0,5
+    </select>
+
+    <select id="getStockByIds" resultMap="stockMap">
+        SELECT
+        *
+        FROM
+        stock
+        WHERE
+        delete_flag = '0'
+        <if test='stockIds != null'>
+            and id in
+            <foreach collection="stockIds" close=")" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>
