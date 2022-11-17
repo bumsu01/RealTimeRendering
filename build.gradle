@@ -1,0 +1,116 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+}
+
+// front end build를 위한 frontendDir 지정
+def frontendDir = "$projectDir/src/main/frontend"
+
+// frontend resources를 reousrces로 지정
+sourceSets {
+    main {
+        resources { srcDirs = ["$projectDir/src/main/resources"]
+        }
+    }
+}
+
+processResources { dependsOn "frontEndBuildTask" }
+
+processResources {
+    from('src/main/java') {
+        include '**/*.xml'
+    }
+}
+
+group = 'com.kakao'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    // swagger doc make library
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/central' }
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+}
+
+dependencies {
+    // spring boot library
+    implementation 'org.springframework.boot:spring-boot-starter'
+    // web starter library
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // db 연결 library
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    // mybatis springboot library
+    implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.1.3'
+    // compile csv library
+    implementation 'org.apache.commons:commons-csv:1.5'
+    // API Test swagger Library
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.8.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.8.0'
+    // swagger doc make library
+    implementation group: 'io.github.swagger2markup', name: 'swagger2markup', version: '1.3.1'
+    implementation group: 'org.pegdown', name: 'pegdown', version: '1.4.2'
+    // https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter
+    implementation group: 'com.github.pagehelper', name: 'pagehelper-spring-boot-starter', version: '1.4.1'
+    //embedded-redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // compile lombok
+    compileOnly 'org.projectlombok:lombok'
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok-maven-plugin
+    compileOnly group: 'org.projectlombok', name: 'lombok-maven-plugin', version: '1.18.12.0'
+
+    // dev-tool
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // database - h2
+    runtimeOnly 'com.h2database:h2'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // test server library
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+task installReact(type: Exec) {
+    workingDir "$frontendDir"
+    inputs.dir "$frontendDir"
+    group = BasePlugin.BUILD_GROUP
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine "npm.cmd", "audit", "fix"
+        commandLine 'npm.cmd', 'install' }
+    else {
+        commandLine "npm", "audit", "fix" commandLine 'npm', 'install'
+    }
+}
+
+task buildReact(type: Exec) {
+    dependsOn "installReact"
+    workingDir "$frontendDir"
+    inputs.dir "$frontendDir"
+    group = BasePlugin.BUILD_GROUP
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine "npm.cmd", "run-script", "build"
+    } else {
+        commandLine "npm", "run-script", "build"
+    }
+}
+
+task frontEndBuildTask(type: Copy) {
+//	dependsOn "buildReact"
+    from "$frontendDir/build"
+    into "$projectDir/src/main/resources/static"
+}
+
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+
