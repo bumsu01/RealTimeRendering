@@ -1,0 +1,50 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#pagehelper
+pagehelper:
+  helper-dialect: h2
+  reasonable: false
+  support-methods-arguments: true
+  params: count=countsql
+
+spring:
+  profiles:
+    active: local
+
+  devtools:
+    add-properties: false
+
+  redis:
+    host: localhost
+    port: 6379
+
+  h2:
+    console:
+      enabled: true							# h2
+      path: /h2-console		        		# localhost:port/h2
+
+  jpa:
+    hibernate:
+      ddl-auto: none                        # ddl auto = none
+
+  datasource:
+    #    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:stockdb; # stock table db
+    username: sa
+
+  # swagger & springboot version bug deal
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher

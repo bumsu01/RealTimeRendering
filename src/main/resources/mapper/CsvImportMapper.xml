@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kakao.bumsu01.dao.CsvImportMapper">
+
+    <insert id="batchInsertStock">
+        INSERT INTO
+        stock (id, code, name, start_price, delete_flag, view_count, trade_count)
+        VALUES
+        <foreach collection="stockList" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.code}, #{item.name}, #{item.startPrice}, #{item.deleteFlag},0,0)
+        </foreach>
+    </insert>
+
+</mapper>
